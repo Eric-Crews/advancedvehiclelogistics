@@ -5,8 +5,12 @@ import { z } from 'zod';
 import { queueEmail, notifySafely, siteUrl } from '@/lib/notifications';
 import { db } from '@/lib/desk-db';
 import { paymentsConfigured } from '@/lib/stripe';
+import { estimateForRequest } from '@/lib/estimate-store';
+import { IntakeError } from '@/lib/estimate-http';
+import type { EstimateDraft } from '@/lib/job-estimate';
 export const dynamic = 'force-dynamic';
 export const requestSchema = z.object({
+  estimateId:z.string().uuid().optional(),
   category:z.enum(['furniture','marketplace','lumber','landscaping','appliance','other']),
   title:z.string().trim().min(3).max(140), description:z.string().trim().min(10).max(3000),
   origin:z.string().trim().min(3).max(200), destination:z.string().trim().min(3).max(200),
@@ -27,9 +31,14 @@ export async function POST(req:Request){
   const {userId}=await auth();if(!userId)return NextResponse.json({error:'Please sign in to send your request.'},{status:401});
   const parsed=requestSchema.safeParse(await req.json().catch(()=>null));
   if(!parsed.success)return NextResponse.json({error:'Please check the highlighted details and try again.',issues:parsed.error.flatten().fieldErrors},{status:400});
-  const d=parsed.data;if(d.contactPreference==='phone'&&!d.contactPhone)return NextResponse.json({error:'Add a phone number if you prefer a call.'},{status:400});
-  try{const result=await env.DB!.prepare('INSERT INTO loads (title,category,description,origin,destination,pickup_date,pickup_type,carry_help,length_ft,weight_lbs,equipment,loading,unloading,contact_name,contact_email,contact_phone,contact_preference,listing_url,status,created_at,customer_clerk_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(d.title,d.category,d.description,d.origin,d.destination,d.pickupDate,d.pickupType,d.carryHelp,d.lengthFt,d.weightLbs,'To be determined',d.carryHelp,d.carryHelp,d.contactName,d.contactEmail,d.contactPhone||null,d.contactPreference,d.listingUrl||null,'broker_review',new Date().toISOString(),userId).run();const requestId=Number(result.meta.last_row_id);const notificationId=`request:${requestId}`;
+  const d=parsed.data;if((d.estimateId||d.contactPreference==='phone')&&!d.contactPhone)return NextResponse.json({error:'Add a phone number if you prefer a call.'},{status:400});
+  try{
+  const stored=d.estimateId?await estimateForRequest(req,d.estimateId,{title:d.title,category:d.category,description:d.description,origin:d.origin,destination:d.destination,carryHelp:d.carryHelp} as Omit<EstimateDraft,'roadMiles'>):null;
+  if(stored?.load_id)return NextResponse.json({id:stored.load_id,status:'broker_review',alreadySubmitted:true});
+  const insert=db().prepare('INSERT INTO loads (title,category,description,origin,destination,pickup_date,pickup_type,carry_help,length_ft,weight_lbs,equipment,loading,unloading,contact_name,contact_email,contact_phone,contact_preference,listing_url,status,created_at,customer_clerk_id,estimate_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(d.title,d.category,d.description,d.origin,d.destination,d.pickupDate,d.pickupType,d.carryHelp,d.lengthFt,d.weightLbs,'To be determined',d.carryHelp,d.carryHelp,d.contactName,d.contactEmail,d.contactPhone||null,d.contactPreference,d.listingUrl||null,'broker_review',new Date().toISOString(),userId,d.estimateId||null);
+  const results=await db().batch([insert,...(d.estimateId?[db().prepare('UPDATE job_estimates SET load_id=(SELECT id FROM loads WHERE estimate_id=?) WHERE id=? AND load_id IS NULL').bind(d.estimateId,d.estimateId)]:[])]);
+  const requestId=Number(results[0].meta.last_row_id);const notificationId=`request:${requestId}`;
   try{await db().batch([queueEmail(notificationId,requestId,process.env.AVL_ADMIN_EMAIL||'',`New AVL delivery request #${requestId}: ${d.title}`,`${d.contactName} requested a delivery.\n${d.origin} → ${d.destination}\n\n${d.description}\n\nReview: ${siteUrl()}/desk?request=${requestId}`)]);await notifySafely(notificationId)}catch{console.error('Request notification could not be queued')}
   return NextResponse.json({id:requestId,status:'broker_review'},{status:201})}
-  catch(e){console.error('Request submission failed',e);return NextResponse.json({error:'We could not save your request. Please try again.'},{status:503})}
+  catch(e){if(e instanceof IntakeError)return NextResponse.json({error:e.message},{status:e.status});console.error('Request submission failed',e instanceof Error?e.name:'error');return NextResponse.json({error:'We could not save your request. Please try again.'},{status:503})}
 }

@@ -6,10 +6,12 @@ import { queueEmail, notifySafely, siteUrl } from '@/lib/notifications';
 import { stripeClient } from '@/lib/stripe';
 import { providers, money } from '@/lib/quote-math';
 import type { DeskLoad,DeskQuote,DeliveryOption } from '@/lib/desk-types';
+import { loadJobEstimate } from '@/lib/estimate-store';
 export const dynamic='force-dynamic';
 type Context={params:Promise<{id:string}>};
 const amount=z.number().int().min(0).max(100000000);
 const schema=z.discriminatedUnion('action',[
+ z.object({action:z.literal('verify_requirements'),confirmed:z.literal(true),note:z.string().trim().min(20).max(2000)}),
  z.object({action:z.literal('option'),provider:z.enum(providers),costCents:amount,extraCents:amount,service:z.string().trim().min(3).max(300),timing:z.string().trim().min(3).max(300),availability:z.enum(['unconfirmed','confirmed','unavailable']),validUntil:z.string().datetime().nullable(),internalNote:z.string().trim().max(2000)}),
  z.object({action:z.literal('quote'),optionId:z.string().uuid(),expectedQuoteId:z.string().nullable(),priceCents:amount.min(100),feeBps:z.number().int().min(0).max(2000),fixedFeeCents:amount.max(10000),scope:z.string().trim().min(10).max(2000),timing:z.string().trim().min(3).max(300),expiresAt:z.string().datetime()}),
  z.object({action:z.literal('manual_payment'),quoteId:z.string(),amountCents:amount.min(100),reference:z.string().trim().min(3).max(200),confirmed:z.literal(true)}),
@@ -23,14 +25,15 @@ export async function GET(_req:Request,{params}:Context){
  if(!await isOperator())return fail('Owner access required.',403);
  const {id}=await params;if(!/^\d+$/.test(id))return fail('Invalid request');
  try{
-  const load=await db().prepare('SELECT * FROM loads WHERE id=?').bind(Number(id)).first();if(!load)return fail('Request not found',404);
+  const load=await db().prepare('SELECT * FROM loads WHERE id=?').bind(Number(id)).first<DeskLoad>();if(!load)return fail('Request not found',404);
   const [options,quotes,events,notifications]=await Promise.all([
    db().prepare('SELECT * FROM delivery_options WHERE load_id=? ORDER BY created_at DESC').bind(Number(id)).all(),
    db().prepare('SELECT * FROM delivery_quotes WHERE load_id=? ORDER BY created_at DESC').bind(Number(id)).all(),
    db().prepare('SELECT * FROM desk_events WHERE load_id=? ORDER BY id DESC LIMIT 100').bind(Number(id)).all(),
    db().prepare('SELECT id,recipient,subject,status,error,created_at FROM notifications WHERE load_id=? ORDER BY created_at DESC LIMIT 50').bind(Number(id)).all(),
   ]);
-  return NextResponse.json({load,options:options.results,quotes:quotes.results,events:events.results,notifications:notifications.results});
+  const estimate=await loadJobEstimate(load.estimate_id);
+  return NextResponse.json({load,estimate,options:options.results,quotes:quotes.results,events:events.results,notifications:notifications.results});
  }catch{return fail('Could not load request.',503)}
 }
 export async function POST(req:Request,{params}:Context){
@@ -40,9 +43,14 @@ export async function POST(req:Request,{params}:Context){
  try{
   const load=await db().prepare('SELECT * FROM loads WHERE id=?').bind(id).first<DeskLoad>();if(!load)return fail('Request not found.',404);
   const stamp=now();
-  if(d.action==='option'){
+  if(d.action==='verify_requirements'){
+   await db().batch([db().prepare('UPDATE loads SET requirements_verified_at=?,requirements_verification_note=? WHERE id=?').bind(stamp,d.note,id),audit(id,'AVL owner','Confirmed requirements with customer by phone: '+d.note)]);
+  }else if(d.action==='option'){
    await db().batch([db().prepare('INSERT INTO delivery_options (id,load_id,provider,cost_cents,extra_cents,service,timing,availability,valid_until,internal_note,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)').bind(crypto.randomUUID(),id,d.provider,d.costCents,d.extraCents,d.service,d.timing,d.availability,d.validUntil,d.internalNote,stamp),audit(id,'AVL owner',`Added ${d.provider} option at ${money(d.costCents+d.extraCents)}; ${d.availability}.`)]);
   }else if(d.action==='quote'){
+   if(load.estimate_id&&!load.requirements_verified_at)return fail('Confirm the delivery requirements with the customer by phone before sending a quote.');
+   const jobEstimate=await loadJobEstimate(load.estimate_id);
+   if(jobEstimate&&d.priceCents<jobEstimate.pricing.minimumJobCents)return fail('The quoted price is below the minimum delivery price.');
    const expires=Date.parse(d.expiresAt);if(expires<Date.now()+3600000||expires>Date.now()+7*86400000)return fail('Quote expiration must be between 1 hour and 7 days from now.');
    const option=await db().prepare('SELECT * FROM delivery_options WHERE id=? AND load_id=?').bind(d.optionId,id).first<DeliveryOption>();
    if(!option||option.availability!=='confirmed')return fail('Choose an option with confirmed availability before sending.');
@@ -62,6 +70,7 @@ export async function POST(req:Request,{params}:Context){
    if(!result)return fail('Only the current, unexpired quote without an active checkout can receive a manual payment record.',409);
    await db().batch([db().prepare("UPDATE loads SET status='paid' WHERE id=? AND current_quote_id=?").bind(id,d.quoteId),audit(id,'AVL owner',`Recorded external payment ${money(d.amountCents)}. Reference: ${d.reference}.`)]);
   }else if(d.action==='booking'){
+   if(load.estimate_id&&!load.requirements_verified_at)return fail('Confirm the delivery requirements before dispatch.');
    const transitions:Record<string,string[]>={not_booked:['booked','issue'],booked:['booked','in_transit','issue'],in_transit:['in_transit','delivered','issue'],issue:['issue','booked','in_transit'],delivered:['delivered']};
    if(!transitions[load.booking_status]?.includes(d.status))return fail('Use the next booking stage. A delivery must be booked before it can be marked in transit or delivered.');
    const result=await db().prepare(`UPDATE loads SET booking_status=?,status=?,booked_provider=?,booking_reference=?,booking_note=?,actual_cost_cents=?,booked_at=COALESCE(booked_at,?) WHERE id=? AND booking_status=? AND EXISTS (SELECT 1 FROM delivery_quotes q WHERE q.id=loads.current_quote_id AND q.status='paid') RETURNING id`).bind(d.status,d.status==='issue'?'delivery_issue':d.status,d.provider,d.reference,d.customerNote,d.actualCostCents,stamp,id,load.booking_status).first();

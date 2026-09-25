@@ -21,6 +21,9 @@ export const loads = sqliteTable('loads', {
   bookingNote: text('booking_note'),
   bookedAt: text('booked_at'),
   actualCostCents: integer('actual_cost_cents'),
+  estimateId: text('estimate_id').unique(),
+  requirementsVerifiedAt: text('requirements_verified_at'),
+  requirementsVerificationNote: text('requirements_verification_note'),
   origin: text('origin').notNull(),
   destination: text('destination').notNull(),
   publicOrigin: text('public_origin'),
@@ -87,3 +90,14 @@ export const deskEvents=sqliteTable('desk_events',{
 export const notifications=sqliteTable('notifications',{
  id:text('id').primaryKey(),loadId:integer('load_id').notNull().references(()=>loads.id),recipient:text('recipient').notNull(),subject:text('subject').notNull(),body:text('body').notNull(),status:text('status').notNull().default('pending'),error:text('error'),createdAt:text('created_at').notNull(),sentAt:text('sent_at'),
 },t=>[index('idx_notifications_load').on(t.loadId)]);
+
+export const jobEstimates = sqliteTable('job_estimates', {
+  id: text('id').primaryKey(), sessionHash: text('session_hash').notNull(),
+  inputJson: text('input_json').notNull(), assessmentJson: text('assessment_json').notNull(), pricingJson: text('pricing_json').notNull(), draftJson: text('draft_json').notNull(),
+  model: text('model').notNull(), promptVersion: text('prompt_version').notNull(), policyVersion: text('policy_version').notNull(),
+  loadId: integer('load_id').references(() => loads.id), createdAt: text('created_at').notNull(), expiresAt: text('expires_at').notNull(),
+}, t => [index('idx_estimates_session').on(t.sessionHash), index('idx_estimates_expiry').on(t.expiresAt)]);
+
+export const aiUsageLimits = sqliteTable('ai_usage_limits', {
+  key: text('key').primaryKey(), count: integer('count').notNull().default(0), expiresAt: integer('expires_at').notNull(),
+}, t => [index('idx_ai_limits_expiry').on(t.expiresAt)]);

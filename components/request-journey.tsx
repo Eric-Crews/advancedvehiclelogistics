@@ -20,3 +20,4 @@ export function RequestJourney({ status }: { status: string }) {
     </li>)}
   </ol>;
 }
+

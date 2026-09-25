@@ -1,115 +1,40 @@
 'use client';
 
-import {
-  ArrowRight, ArrowUpRight, Check, ClipboardCheck, Hammer, MapPin,
-  MessageCircle, Package, Phone, Refrigerator, Route, ShieldCheck,
-  ShoppingBag, Sofa, Sprout,
-} from 'lucide-react';
+import { ArrowRight, Check, ClipboardList, Hammer, MapPin, MessageCircle, Package, Phone, Refrigerator, ShoppingBag, Sofa, Sprout } from 'lucide-react';
+import { RouteEstimator, type EstimatorProps } from './route-estimator';
 
 export type DeliveryCategory = 'furniture' | 'marketplace' | 'lumber' | 'landscaping' | 'appliance' | 'other';
-
-const choices = [
-  { id: 'furniture', label: 'Furniture', icon: Sofa },
-  { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
-  { id: 'lumber', label: 'Lumber', icon: Hammer },
-  { id: 'landscaping', label: 'Yard supplies', icon: Sprout },
-  { id: 'appliance', label: 'Appliances', icon: Refrigerator },
-  { id: 'other', label: 'Something else', icon: Package },
+const services = [
+  { id: 'furniture', title: 'Furniture', description: 'The couch, table, or bed you love. Delivered where you need it.', icon: Sofa },
+  { id: 'marketplace', title: 'Marketplace finds', description: 'Found a great deal? We’ll help with the getting-it-home part.', icon: ShoppingBag },
+  { id: 'lumber', title: 'Building materials', description: 'Lumber, flooring, and the supplies that keep your project moving.', icon: Hammer },
+  { id: 'landscaping', title: 'Yard & garden', description: 'Mulch, soil, plants, and supplies for your next outdoor project.', icon: Sprout },
+  { id: 'appliance', title: 'Appliances', description: 'Tell us what you bought and the lifting or access help it needs.', icon: Refrigerator },
+  { id: 'other', title: 'Business & more', description: 'Store pickups, business supplies, and deliveries a little out of the ordinary.', icon: Package },
 ] as const;
-
-type DeliveryHomeProps = {
-  category: DeliveryCategory;
-  origin: string;
-  destination: string;
-  onCategory: (value: DeliveryCategory) => void;
-  onOrigin: (value: string) => void;
-  onDestination: (value: string) => void;
-  onContinue: () => void;
-  onHow: () => void;
+type Props = EstimatorProps & {
+  category: DeliveryCategory; onCategory: (value: DeliveryCategory) => void; onHow: () => void;
 };
 
-export function DeliveryHome({ category, origin, destination, onCategory, onOrigin, onDestination, onContinue, onHow }: DeliveryHomeProps) {
-  return (
-    <>
-      <section className="delivery-hero" aria-labelledby="hero-title">
-        <div className="hero-copy">
-          <span className="eyebrow"><span className="eyebrow-line" /> The easier way to move what matters</span>
-          <h1 id="hero-title">Your next delivery, <span>handled.</span></h1>
-          <p className="hero-description">Found the perfect couch? Picking up supplies? Tell us what you need moved. We’ll work out the details and give you one clear quote.</p>
-          <div className="hero-values">
-            <span><Check size={17} /> One simple request</span>
-            <span><Check size={17} /> Reviewed by a real person</span>
-            <span><Check size={17} /> No charge to request a quote</span>
-          </div>
-          <a className="hero-phone" href="tel:+18283337155">
-            <span className="phone-disc"><Phone size={19} /></span>
-            <span>Rather talk it through?<strong>Call (828) 333-7155 <ArrowUpRight size={16} /></strong></span>
-          </a>
-        </div>
-        <div className="starter-wrap">
-          <div className="quote-starter">
-            <div className="starter-heading">
-              <span className="small-icon"><Route size={23} strokeWidth={1.8} /></span>
-              <div><span className="starter-kicker">YOUR DELIVERY STARTS HERE</span><h2>What are we moving?</h2></div>
-              <span className="starter-step">01 / 03</span>
-            </div>
-            <form onSubmit={(event) => { event.preventDefault(); onContinue(); }}>
-              <fieldset className="starter-categories">
-                <legend>Choose what sounds closest</legend>
-                <div>{choices.map((choice) => (
-                  <label key={choice.id} className={category === choice.id ? 'active' : ''}>
-                    <input type="radio" name="starter-category" checked={category === choice.id} onChange={() => onCategory(choice.id)} />
-                    <choice.icon size={23} strokeWidth={1.7} />
-                    <span>{choice.label}</span>
-                  </label>
-                ))}</div>
-              </fieldset>
-              <div className={'route-inputs' + (origin && destination ? ' route-complete' : '')}>
-                <div className="route-rail" aria-hidden="true" />
-                <label><span className="route-point" aria-hidden="true" /><span className="route-field"><span>Pickup location</span><input required minLength={3} placeholder="Store, seller, or address" value={origin} onChange={(event) => onOrigin(event.target.value)} /></span></label>
-                <label><span className="route-point destination" aria-hidden="true" /><span className="route-field"><span>Delivery location</span><input required minLength={3} placeholder="Your address or destination" value={destination} onChange={(event) => onDestination(event.target.value)} /></span></label>
-              </div>
-              <button className="primary starter-button" type="submit">Get started <ArrowRight size={19} /></button>
-              <p className="starter-note"><ShieldCheck size={15} /> Free to request. Nothing is booked until you approve it.</p>
-            </form>
-          </div>
-          <div className="starter-under"><span className="under-symbol"><MapPin size={15} /></span> Local coordination, with a human in the loop.</div>
-        </div>
-      </section>
+export function DeliveryHome(props: Props) {
+  return <>
+    <section className="avl-hero" aria-labelledby="hero-title"><div className="shell hero-grid">
+      <div className="hero-copy"><span className="eyebrow"><span /> EVERYDAY DELIVERY. EXTRAORDINARY HELP.</span><h1 id="hero-title">FROM THERE.<br /><span>TO YOUR DOOR.</span></h1><p>A great find. A weekend project. A delivery that won’t fit in your car. We help you get it there—with a clear price and a real person on your side.</p><div className="hero-actions"><a className="primary" href="#delivery-estimate">Get a delivery estimate <ArrowRight size={19} aria-hidden="true" /></a><a className="hero-call" href="tel:+18283337155"><Phone size={19} aria-hidden="true" /><span>Rather talk?<strong>(828) 333-7155</strong></span></a></div><div className="hero-assurances"><span><Check size={17} aria-hidden="true" /> Requests across the U.S.</span><span><Check size={17} aria-hidden="true" /> No payment to get started</span></div></div>
+      <figure className="hero-photo"><img src="/images/everyday-delivery.webp" alt="Two delivery helpers carrying a sofa to a home" width="1200" height="800" fetchPriority="high" /><figcaption><span className="photo-icon"><Package size={24} aria-hidden="true" /></span><span>Big, bulky, or just out of reach.<strong>Let’s make it an easy delivery.</strong></span></figcaption></figure>
+    </div></section>
 
-      <section className="service-section" aria-labelledby="service-title">
-        <div className="section-heading"><div><span className="eyebrow">DELIVERY FOR REAL LIFE</span><h2 id="service-title">The thing you need moved?<br /><em>We get it.</em></h2></div><p>Big purchases, weekend projects, and everything in between. Start with what’s familiar.</p></div>
-        <div className="service-grid">
-          <button type="button" onClick={() => { onCategory('marketplace'); onContinue(); }} className="service-card card-home">
-            <span className="service-art" aria-hidden="true"><span className="service-orbit" /><Sofa size={90} strokeWidth={1.1} /></span>
-            <span className="service-caption">01 / A GREAT FIND</span><h3>Found it. Love it.<br />Let’s get it home.</h3><p>Furniture, Marketplace finds, and appliances that won’t fit in your car.</p><span className="service-link">Plan a pickup <ArrowUpRight size={20} /></span>
-          </button>
-          <button type="button" onClick={() => { onCategory('lumber'); onContinue(); }} className="service-card card-project">
-            <span className="service-art" aria-hidden="true"><span className="service-orbit" /><Hammer size={83} strokeWidth={1.1} /></span>
-            <span className="service-caption">02 / A PROJECT IN MOTION</span><h3>Less hauling.<br />More getting things done.</h3><p>Lumber, mulch, and store pickups for the project you’re ready to start.</p><span className="service-link">Move your supplies <ArrowUpRight size={20} /></span>
-          </button>
-          <button type="button" onClick={() => { onCategory('other'); onContinue(); }} className="service-card card-unusual">
-            <span className="service-art" aria-hidden="true"><span className="service-orbit" /><Package size={87} strokeWidth={1.1} /></span>
-            <span className="service-caption">03 / AN UNUSUAL REQUEST</span><h3>Big, awkward,<br />or a little unusual?</h3><p>Tell us about it. We’ll review the size, route, and handling it needs.</p><span className="service-link">Tell us what’s moving <ArrowUpRight size={20} /></span>
-          </button>
-        </div>
-      </section>
+    <RouteEstimator {...props} />
 
-      <section className="connection-section" aria-labelledby="process-title">
-        <div className="connection-intro"><span className="eyebrow">A BETTER WAY TO GET IT THERE</span><h2 id="process-title">You tell us the what.<br /><em>We figure out the how.</em></h2><p>No need to choose a truck, compare carriers, or learn delivery jargon. We review the practical details and come back with one AVL quote.</p><button className="text-button" type="button" onClick={onHow}>How AVL works <ArrowRight size={18} /></button></div>
-        <div className="connection-steps">
-          {[
-            [ClipboardCheck, 'Tell us what’s moving', 'Give us the item, pickup, destination, and any helpful details.'],
-            [Route, 'We check what fits', 'A person reviews the route, handling needs, and available options.'],
-            [MessageCircle, 'You decide', 'See one clear AVL quote before you choose what happens next.'],
-          ].map(([Icon, title, description], index) => {
-            const StepIcon = Icon as typeof ClipboardCheck;
-            return <div className="connection-step" key={index}><span className="step-icon"><StepIcon size={22} /></span><div><small>0{index + 1}</small><h3>{String(title)}</h3><p>{String(description)}</p></div></div>;
-          })}
-        </div>
-      </section>
+    <section className="shell everyday-section" id="what-we-deliver" aria-labelledby="services-title"><div className="section-heading"><div><span className="eyebrow">WHAT WE DELIVER</span><h2 id="services-title">FOR THE THINGS LIFE THROWS YOUR WAY.</h2></div><p>You find it. You need it.<br />We help you move it.</p></div><div className="everyday-grid">{services.map(service => <button className="everyday-card" key={service.id} onClick={() => { props.onCategory(service.id); props.onContinue(); }} type="button" data-testid={`delivery-${service.id}`}><span className="service-icon"><service.icon size={25} strokeWidth={1.7} aria-hidden="true" /></span><h3>{service.title}</h3><p>{service.description}</p><span className="service-cta">Request delivery <ArrowRight size={17} aria-hidden="true" /></span></button>)}</div></section>
 
-      <section className="agent-strip"><span className="agent-icon"><Phone size={23} /></span><div><span className="eyebrow">HERE WHEN YOU NEED US</span><h3>A real person is part of every quote.</h3><p>Have a tricky item or a time sensitive pickup? Call us and talk through the details.</p></div><a className="secondary" href="tel:+18283337155">Call (828) 333-7155 <ArrowUpRight size={17} /></a></section>
-    </>
-  );
+    <section className="process-section" id="how-delivery-works" aria-labelledby="process-title"><div className="shell"><div className="section-heading"><div><span className="eyebrow">LESS FIGURING IT OUT. MORE GETTING IT DONE.</span><h2 id="process-title">ONE REQUEST. WE TAKE IT FROM THERE.</h2></div><button type="button" className="light-link" onClick={props.onHow}>How AVL works <ArrowRight size={18} aria-hidden="true" /></button></div><div className="process-grid">{[
+      { icon: ClipboardList, title: 'Tell us what’s moving.', text: 'Type or speak what you need moved. Include stairs, size, access, and timing in your own words.' },
+      { icon: MessageCircle, title: 'Get one clear quote.', text: 'See a preliminary estimate. We call to confirm the details, then send the final price and delivery plan.' },
+      { icon: Package, title: 'Approve. We arrange it.', text: 'Once you approve and pay, we coordinate the delivery and keep you in the loop.' },
+    ].map((step, index) => <article className="process-card" key={step.title}><div className="process-top"><span>{String(index + 1).padStart(2, '0')}</span><step.icon size={28} strokeWidth={1.5} aria-hidden="true" /></div><h3>{step.title}</h3><p>{step.text}</p></article>)}</div></div></section>
+
+    <section className="shell route-pricing-section" aria-labelledby="pricing-title"><div className="national-copy"><span className="eyebrow">ROOTED IN SERVICE. READY TO GO FURTHER.</span><h2>YOUR CITY.<br />YOUR DELIVERY.</h2><p>A Marketplace pickup in Seattle. Garden supplies in Denver. Lumber in Charlotte. Start with what you need moved, wherever you are.</p><p className="coverage-note"><MapPin size={20} aria-hidden="true" /><span>Requests welcome across the U.S. We confirm service availability for your route, items, and schedule.</span></p></div><div className="pricing-card"><span className="eyebrow">PRICED FOR THE WORK INVOLVED</span><h2 id="pricing-title">THE WHOLE JOB COUNTS.</h2><p className="big-rate">$60<span>minimum delivery price</span></p><p>Your estimate considers the people, time, travel, and handling your delivery actually needs.</p><div className="pricing-example"><span>A two-mile trip can still need two movers.</span><strong>Stairs. Lifting. Time.<small>We account for all of it.</small></strong></div><p className="pricing-note">A preliminary estimate helps you plan. We confirm the details with you and check availability before sending a final quote.</p><a className="text-button" href="#delivery-estimate">Describe your delivery <ArrowRight size={17} aria-hidden="true" /></a></div></section>
+
+    <section className="help-band"><div className="shell"><div><span className="eyebrow">GOOD PEOPLE. PRACTICAL HELP.</span><h2>LET’S GET YOUR DAY MOVING.</h2><p>Have a tricky item or a question? Start a request, or give us a call.</p></div><div className="help-actions"><a href="#delivery-estimate" className="primary">Start my delivery <ArrowRight size={18} aria-hidden="true" /></a><a href="tel:+18283337155"><Phone size={18} aria-hidden="true" /> (828) 333-7155</a></div></div></section>
+  </>;
 }

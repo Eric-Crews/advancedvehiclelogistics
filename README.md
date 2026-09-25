@@ -5,6 +5,7 @@ Advanced Vehicle Logistics is a customer-friendly delivery platform for everyday
 The app includes:
 
 - a guided customer quote-request flow
+- typed/voice delivery assessment with OpenAI, crew/time pricing, and a $60 job minimum
 - Clerk sign-in and account-based request tracking
 - a private quote desk for comparing AVL, Curri, Roadie, Warp, and other options
 - cost, margin, quote, payment, and booking-status workflows
@@ -38,6 +39,8 @@ pnpm build
 Copy `.env.example` to `.env.local` and fill in only the services you are using. Never commit `.env.local` or live secrets.
 
 Clerk is required for customer and driver accounts. The quote desk is restricted to the configured AVL operator. Stripe remains disabled unless `AVL_PAYMENTS_ENABLED=true` and all required Stripe settings are present.
+
+AI estimates require the server secret `OPENAI_API_KEY`. Without it, customers can still submit for human review. Pricing assumptions, prompt/schema, activation, limits, and the phone-confirmation workflow are documented in [Delivery estimation](docs/delivery-estimation.md).
 
 ## Database
 

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `loads_estimate_id_unique` ON `loads` (`estimate_id`);
