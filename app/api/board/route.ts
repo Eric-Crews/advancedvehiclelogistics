@@ -1,0 +1,5 @@
+import { auth } from '@clerk/nextjs/server';
+import { env } from 'cloudflare:workers';
+import { NextResponse } from 'next/server';
+export const dynamic='force-dynamic';
+export async function GET(){const {userId}=await auth();if(!userId)return NextResponse.json({error:'Sign in to view the carrier board.'},{status:401});try{const driver=await env.DB!.prepare('SELECT clerk_user_id FROM drivers WHERE clerk_user_id=?').bind(userId).first();if(!driver)return NextResponse.json({error:'Register as a driver to view available loads.'},{status:403});const result=await env.DB!.prepare("SELECT id,title,public_summary AS description,public_origin AS origin,public_destination AS destination,pickup_date AS pickupDate,length_ft AS lengthFt,weight_lbs AS weightLbs,equipment,loading,unloading,status FROM loads WHERE status='open' AND public_origin IS NOT NULL AND public_destination IS NOT NULL AND public_summary IS NOT NULL ORDER BY id DESC LIMIT 60").all();return NextResponse.json({loads:result.results})}catch(e){console.error('Carrier board fetch failed',e);return NextResponse.json({error:'Carrier board unavailable.'},{status:503})}}

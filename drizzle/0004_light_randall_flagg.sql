@@ -1,0 +1,1 @@
+ALTER TABLE `loads` ADD `public_summary` text;
