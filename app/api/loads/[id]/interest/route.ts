@@ -1,0 +1,5 @@
+import { auth } from '@clerk/nextjs/server';
+import { env } from 'cloudflare:workers';
+import { NextResponse } from 'next/server';
+export const dynamic='force-dynamic';
+export async function POST(_req:Request,{params}:{params:Promise<{id:string}>}){const {userId}=await auth();if(!userId)return NextResponse.json({error:'Sign in to respond to your quote.'},{status:401});const {id}=await params;if(!/^\d+$/.test(id))return NextResponse.json({error:'Invalid request.'},{status:400});try{const result=await env.DB!.prepare("UPDATE loads SET status='customer_interested' WHERE id=? AND customer_clerk_id=? AND status='quote_ready' AND (current_quote_id IS NULL OR EXISTS (SELECT 1 FROM delivery_quotes q WHERE q.id=loads.current_quote_id AND q.status='sent' AND q.expires_at>strftime('%Y-%m-%dT%H:%M:%fZ','now')))").bind(Number(id),userId).run();if(!result.meta.changes)return NextResponse.json({error:'This quote is no longer available for a response.'},{status:409});return NextResponse.json({status:'customer_interested'})}catch(e){console.error('Quote interest failed',e);return NextResponse.json({error:'Could not send your response.'},{status:503})}}
