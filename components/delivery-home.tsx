@@ -1,7 +1,115 @@
 'use client';
-import { ArrowRight, ArrowUpRight, Sofa, ShoppingBag, Hammer, Sprout, Refrigerator, Package, Phone, ClipboardCheck, Route, MessageCircle, Check, Code2 } from 'lucide-react';
-export type DeliveryCategory='furniture'|'marketplace'|'lumber'|'landscaping'|'appliance'|'other';
-const choices=[{id:'furniture',label:'Furniture',icon:Sofa},{id:'marketplace',label:'Marketplace',icon:ShoppingBag},{id:'lumber',label:'Lumber',icon:Hammer},{id:'landscaping',label:'Yard supplies',icon:Sprout},{id:'appliance',label:'Appliances',icon:Refrigerator},{id:'other',label:'Something else',icon:Package}] as const;
-export function DeliveryHome({category,origin,destination,onCategory,onOrigin,onDestination,onContinue,onHow}:{category:DeliveryCategory;origin:string;destination:string;onCategory:(v:DeliveryCategory)=>void;onOrigin:(v:string)=>void;onDestination:(v:string)=>void;onContinue:()=>void;onHow:()=>void}){
- return <><section className="delivery-hero"><div className="hero-copy"><span className="eyebrow"><span className="eyebrow-line"/> EVERYDAY DELIVERY. THOUGHTFULLY CONNECTED.</span><h1>Your next delivery,<br/><span>handled.</span></h1><p className="hero-description">The couch you found. The supplies you need. A simpler way to connect what needs moving with the right delivery option.</p><div className="hero-values"><span><Check size={17}/> One simple request</span><span><Check size={17}/> A real person on your side</span></div><a className="hero-phone" href="tel:+18283337155"><span className="phone-disc"><Phone size={19}/></span><span>Prefer a conversation?<strong>(828) 333-7155 <ArrowUpRight size={15}/></strong></span></a></div><div className="quote-starter"><div className="starter-heading"><span className="small-icon"><Package size={20}/></span><div><h2>Let’s get it there.</h2><p>Start your free delivery quote.</p></div><span className="starter-step">LET’S START</span></div><form onSubmit={e=>{e.preventDefault();onContinue()}}><fieldset className="starter-categories"><legend>What are we moving?</legend><div>{choices.map(c=><label key={c.id} className={category===c.id?'active':''}><input type="radio" name="starter-category" checked={category===c.id} onChange={()=>onCategory(c.id)}/><c.icon size={21} strokeWidth={1.7}/><span>{c.label}</span></label>)}</div></fieldset><div className="route-inputs"><label><span className="route-point"/><span className="sr-only">Pickup location</span><input aria-label="Pickup location" required minLength={3} placeholder="Pickup address or store + town" value={origin} onChange={e=>onOrigin(e.target.value)}/></label><label><span className="route-point destination"/><span className="sr-only">Delivery location</span><input aria-label="Delivery location" required minLength={3} placeholder="Delivery address or town" value={destination} onChange={e=>onDestination(e.target.value)}/></label></div><button className="primary starter-button">Continue with delivery details <ArrowRight size={19}/></button><p className="starter-note">Free to request. You decide after seeing the quote.</p></form></div></section><section className="service-section" aria-labelledby="service-title"><div className="section-heading"><div><span className="eyebrow">MADE FOR REAL LIFE</span><h2 id="service-title">A little help for your next big thing.</h2></div><p>No truck? No problem.<br/>Tell us what you have in mind.</p></div><div className="service-grid"><button onClick={()=>{onCategory('marketplace');onContinue()}} className="service-card"><span className="service-icon blue"><Sofa size={32} strokeWidth={1.5}/></span><span className="service-caption">FOR YOUR HOME</span><h3>Found it. Love it.<br/>Let’s get it home.</h3><p>Marketplace finds, furniture, and appliances that won’t fit in your car.</p><span className="service-link">Plan a pickup <ArrowUpRight size={20}/></span></button><button onClick={()=>{onCategory('lumber');onContinue()}} className="service-card"><span className="service-icon orange"><Hammer size={32} strokeWidth={1.5}/></span><span className="service-caption">FOR YOUR NEXT PROJECT</span><h3>Less hauling.<br/>More getting things done.</h3><p>Lumber, mulch, and store pickups for the project you’re ready to start.</p><span className="service-link">Move your supplies <ArrowUpRight size={20}/></span></button><button onClick={()=>{onCategory('other');onContinue()}} className="service-card"><span className="service-icon violet"><Package size={32} strokeWidth={1.5}/></span><span className="service-caption">FOR EVERYTHING ELSE</span><h3>Big, awkward,<br/>or a little unusual?</h3><p>Tell us about it. We’ll review the size, route, and help it needs.</p><span className="service-link">Tell us what’s moving <ArrowUpRight size={20}/></span></button></div></section><section className="connection-section"><div className="connection-intro"><span className="eyebrow">SMART COORDINATION. HUMAN CARE.</span><h2>A simple request.<br/>A thoughtful response.</h2><p>You shouldn’t have to figure out which truck or delivery service to use. Give us the details, and we’ll help find an option that fits.</p><button className="text-button" onClick={onHow}>See how it works <ArrowRight size={18}/></button></div><div className="connection-steps">{[[ClipboardCheck,'Tell us what’s moving','The item, pickup, destination, and a few helpful details.'],[Route,'We check the right fit','A person reviews handling needs and available delivery options.'],[MessageCircle,'You choose what happens next','Review the quote in your account before making a decision.']].map(([Icon,title,description],i)=>{const StepIcon=Icon as typeof ClipboardCheck;return <div className="connection-step" key={i}><span className="step-icon"><StepIcon size={21}/></span><div><small>0{i+1}</small><h3>{String(title)}</h3><p>{String(description)}</p></div></div>})}</div></section><section className="agent-strip"><span className="agent-icon"><Code2 size={27}/></span><div><h3>Built for you. Ready for your assistant.</h3><p>Start a request yourself, or let your AI assistant help with the details. The same team reviews every request.</p></div><button className="secondary" onClick={onHow}>Explore the platform <ArrowUpRight size={17}/></button></section></>;
+
+import {
+  ArrowRight, ArrowUpRight, Check, ClipboardCheck, Hammer, MapPin,
+  MessageCircle, Package, Phone, Refrigerator, Route, ShieldCheck,
+  ShoppingBag, Sofa, Sprout,
+} from 'lucide-react';
+
+export type DeliveryCategory = 'furniture' | 'marketplace' | 'lumber' | 'landscaping' | 'appliance' | 'other';
+
+const choices = [
+  { id: 'furniture', label: 'Furniture', icon: Sofa },
+  { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
+  { id: 'lumber', label: 'Lumber', icon: Hammer },
+  { id: 'landscaping', label: 'Yard supplies', icon: Sprout },
+  { id: 'appliance', label: 'Appliances', icon: Refrigerator },
+  { id: 'other', label: 'Something else', icon: Package },
+] as const;
+
+type DeliveryHomeProps = {
+  category: DeliveryCategory;
+  origin: string;
+  destination: string;
+  onCategory: (value: DeliveryCategory) => void;
+  onOrigin: (value: string) => void;
+  onDestination: (value: string) => void;
+  onContinue: () => void;
+  onHow: () => void;
+};
+
+export function DeliveryHome({ category, origin, destination, onCategory, onOrigin, onDestination, onContinue, onHow }: DeliveryHomeProps) {
+  return (
+    <>
+      <section className="delivery-hero" aria-labelledby="hero-title">
+        <div className="hero-copy">
+          <span className="eyebrow"><span className="eyebrow-line" /> The easier way to move what matters</span>
+          <h1 id="hero-title">Your next delivery, <span>handled.</span></h1>
+          <p className="hero-description">Found the perfect couch? Picking up supplies? Tell us what you need moved. We’ll work out the details and give you one clear quote.</p>
+          <div className="hero-values">
+            <span><Check size={17} /> One simple request</span>
+            <span><Check size={17} /> Reviewed by a real person</span>
+            <span><Check size={17} /> No charge to request a quote</span>
+          </div>
+          <a className="hero-phone" href="tel:+18283337155">
+            <span className="phone-disc"><Phone size={19} /></span>
+            <span>Rather talk it through?<strong>Call (828) 333-7155 <ArrowUpRight size={16} /></strong></span>
+          </a>
+        </div>
+        <div className="starter-wrap">
+          <div className="quote-starter">
+            <div className="starter-heading">
+              <span className="small-icon"><Route size={23} strokeWidth={1.8} /></span>
+              <div><span className="starter-kicker">YOUR DELIVERY STARTS HERE</span><h2>What are we moving?</h2></div>
+              <span className="starter-step">01 / 03</span>
+            </div>
+            <form onSubmit={(event) => { event.preventDefault(); onContinue(); }}>
+              <fieldset className="starter-categories">
+                <legend>Choose what sounds closest</legend>
+                <div>{choices.map((choice) => (
+                  <label key={choice.id} className={category === choice.id ? 'active' : ''}>
+                    <input type="radio" name="starter-category" checked={category === choice.id} onChange={() => onCategory(choice.id)} />
+                    <choice.icon size={23} strokeWidth={1.7} />
+                    <span>{choice.label}</span>
+                  </label>
+                ))}</div>
+              </fieldset>
+              <div className={'route-inputs' + (origin && destination ? ' route-complete' : '')}>
+                <div className="route-rail" aria-hidden="true" />
+                <label><span className="route-point" aria-hidden="true" /><span className="route-field"><span>Pickup location</span><input required minLength={3} placeholder="Store, seller, or address" value={origin} onChange={(event) => onOrigin(event.target.value)} /></span></label>
+                <label><span className="route-point destination" aria-hidden="true" /><span className="route-field"><span>Delivery location</span><input required minLength={3} placeholder="Your address or destination" value={destination} onChange={(event) => onDestination(event.target.value)} /></span></label>
+              </div>
+              <button className="primary starter-button" type="submit">Get started <ArrowRight size={19} /></button>
+              <p className="starter-note"><ShieldCheck size={15} /> Free to request. Nothing is booked until you approve it.</p>
+            </form>
+          </div>
+          <div className="starter-under"><span className="under-symbol"><MapPin size={15} /></span> Local coordination, with a human in the loop.</div>
+        </div>
+      </section>
+
+      <section className="service-section" aria-labelledby="service-title">
+        <div className="section-heading"><div><span className="eyebrow">DELIVERY FOR REAL LIFE</span><h2 id="service-title">The thing you need moved?<br /><em>We get it.</em></h2></div><p>Big purchases, weekend projects, and everything in between. Start with what’s familiar.</p></div>
+        <div className="service-grid">
+          <button type="button" onClick={() => { onCategory('marketplace'); onContinue(); }} className="service-card card-home">
+            <span className="service-art" aria-hidden="true"><span className="service-orbit" /><Sofa size={90} strokeWidth={1.1} /></span>
+            <span className="service-caption">01 / A GREAT FIND</span><h3>Found it. Love it.<br />Let’s get it home.</h3><p>Furniture, Marketplace finds, and appliances that won’t fit in your car.</p><span className="service-link">Plan a pickup <ArrowUpRight size={20} /></span>
+          </button>
+          <button type="button" onClick={() => { onCategory('lumber'); onContinue(); }} className="service-card card-project">
+            <span className="service-art" aria-hidden="true"><span className="service-orbit" /><Hammer size={83} strokeWidth={1.1} /></span>
+            <span className="service-caption">02 / A PROJECT IN MOTION</span><h3>Less hauling.<br />More getting things done.</h3><p>Lumber, mulch, and store pickups for the project you’re ready to start.</p><span className="service-link">Move your supplies <ArrowUpRight size={20} /></span>
+          </button>
+          <button type="button" onClick={() => { onCategory('other'); onContinue(); }} className="service-card card-unusual">
+            <span className="service-art" aria-hidden="true"><span className="service-orbit" /><Package size={87} strokeWidth={1.1} /></span>
+            <span className="service-caption">03 / AN UNUSUAL REQUEST</span><h3>Big, awkward,<br />or a little unusual?</h3><p>Tell us about it. We’ll review the size, route, and handling it needs.</p><span className="service-link">Tell us what’s moving <ArrowUpRight size={20} /></span>
+          </button>
+        </div>
+      </section>
+
+      <section className="connection-section" aria-labelledby="process-title">
+        <div className="connection-intro"><span className="eyebrow">A BETTER WAY TO GET IT THERE</span><h2 id="process-title">You tell us the what.<br /><em>We figure out the how.</em></h2><p>No need to choose a truck, compare carriers, or learn delivery jargon. We review the practical details and come back with one AVL quote.</p><button className="text-button" type="button" onClick={onHow}>How AVL works <ArrowRight size={18} /></button></div>
+        <div className="connection-steps">
+          {[
+            [ClipboardCheck, 'Tell us what’s moving', 'Give us the item, pickup, destination, and any helpful details.'],
+            [Route, 'We check what fits', 'A person reviews the route, handling needs, and available options.'],
+            [MessageCircle, 'You decide', 'See one clear AVL quote before you choose what happens next.'],
+          ].map(([Icon, title, description], index) => {
+            const StepIcon = Icon as typeof ClipboardCheck;
+            return <div className="connection-step" key={index}><span className="step-icon"><StepIcon size={22} /></span><div><small>0{index + 1}</small><h3>{String(title)}</h3><p>{String(description)}</p></div></div>;
+          })}
+        </div>
+      </section>
+
+      <section className="agent-strip"><span className="agent-icon"><Phone size={23} /></span><div><span className="eyebrow">HERE WHEN YOU NEED US</span><h3>A real person is part of every quote.</h3><p>Have a tricky item or a time sensitive pickup? Call us and talk through the details.</p></div><a className="secondary" href="tel:+18283337155">Call (828) 333-7155 <ArrowUpRight size={17} /></a></section>
+    </>
+  );
 }
