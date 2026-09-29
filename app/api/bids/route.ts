@@ -3,7 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 export const dynamic='force-dynamic';
-const schema=z.object({loadId:z.number().int().positive(),carrierName:z.string().trim().min(2).max(150),contactEmail:z.string().email().max(200),mcNumber:z.string().trim().min(3).max(30),equipment:z.string().trim().min(3).max(100),amount:z.number().positive().max(1000000),note:z.string().max(1000).optional()});
+const schema=z.object({loadId:z.number().int().positive(),carrierName:z.string().trim().min(2).max(150),contactEmail:z.string().email().max(200),mcNumber:z.string().trim().max(30),equipment:z.string().trim().min(3).max(100),amount:z.number().positive().max(1000000),note:z.string().max(1000).optional()});
 export async function POST(req:NextRequest){
   const {userId}=await auth();if(!userId)return NextResponse.json({error:'Sign in to offer a rate.'},{status:401});
   let body;try{body=schema.safeParse(await req.json())}catch{return NextResponse.json({error:'Invalid request.'},{status:400})}

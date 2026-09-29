@@ -524,6 +524,30 @@ label { font-size:.9375rem; font-weight:600; }
 .driver-aside-card p,.driver-aside-help p { font-size:.9375rem; line-height:1.7; color:var(--muted); }
 .driver-aside-card>a,.driver-aside-help>a { display:inline-flex; align-items:center; gap:7px; color:var(--blue-dark); font-size:.875rem; font-weight:700; }
 .driver-aside-status { display:flex; align-items:center; gap:7px; margin-bottom:17px; color:#286243; font-size:.875rem; font-weight:700; }
+.driver-freight-hero { background:radial-gradient(circle at 82% 16%,#31566b 0%,#172c3d 43%,#142533 100%); }
+.driver-freight-grid { display:grid; grid-template-columns:1.03fr .97fr; align-items:center; gap:68px; padding-block:72px 82px; }
+.driver-freight-grid .driver-hero-copy h1 { max-width:610px; }
+.driver-route-panel { padding:27px; border:1px solid #ffffff50; border-radius:10px; background:#ffffff0d; box-shadow:0 24px 65px #07162050; }
+.driver-route-panel-top { display:flex; justify-content:space-between; gap:10px; padding:0 0 20px; color:#c9dae5; font-size:.75rem; font-weight:800; letter-spacing:.13em; }
+.driver-route-panel-top span:last-child { color:#ffb673; }
+.driver-route-leg { position:relative; padding:24px 25px 21px; border:1px solid #ffffff39; border-radius:7px; background:#f7fafc; color:var(--ink); }
+.driver-route-leg+.driver-route-leg { margin-top:12px; }
+.driver-route-index { display:block; color:var(--blue-dark); font-size:.75rem; font-weight:800; letter-spacing:.13em; }
+.driver-route-leg strong { display:block; margin:5px 0; font-family:var(--font-display); font-size:clamp(1.85rem,2.6vw,2.8rem); line-height:1.12; }
+.driver-route-leg strong span { color:var(--orange); }
+.driver-route-leg p { margin:0; color:var(--muted); font-size:.875rem; }
+.driver-return-leg { border-color:#eda065; background:#fff4e9; }
+.driver-return-leg .driver-route-index { color:#a54700; }
+.driver-route-panel-bottom { padding-top:18px; color:#dce8ee; font-size:.875rem; }
+.driver-board-search { padding:20px 23px 15px; margin:0 0 20px; border:1px solid var(--line); border-radius:8px; background:#fff; }
+.driver-board-search label { display:block; margin-bottom:7px; }
+.driver-board-search>div { position:relative; }
+.driver-board-search svg { position:absolute; z-index:1; left:15px; top:22px; color:var(--blue-dark); }
+.driver-board-search input { margin:0; padding-left:46px; }
+.driver-board-search p { margin:8px 0 0; color:var(--muted); font-size:.875rem; line-height:1.55; }
+.driver-return-match { display:inline-flex; margin:-4px 0 14px; padding:7px 11px; border-radius:4px; background:#fff0df; color:#82400b; font-size:.8125rem; font-weight:700; }
+@media(max-width:800px) { .driver-freight-grid { grid-template-columns:1fr; gap:35px; padding-block:55px 65px; } }
+@media(max-width:640px) { .driver-freight-grid { padding-block:44px 55px; } .driver-freight-grid .driver-hero-copy h1 { font-size:clamp(3.3rem,12vw,4.4rem); } .driver-route-panel { padding:16px; } .driver-route-leg { padding:18px; } .driver-route-leg strong { font-size:2rem; } .driver-board-search { padding:17px; } }
 @media(max-width:1000px) { .driver-hero-grid { gap:33px; } .driver-hero-copy h1 { font-size:4.3rem; } .driver-register-grid { gap:39px; } .driver-board-layout { gap:20px; } }
 @media(max-width:800px) { .driver-hero-grid { grid-template-columns:1fr; padding-block:57px 60px; } .driver-hero-image { min-height:0; height:380px; } .driver-intro-grid { gap:12px; } .driver-intro-grid article { padding:22px; } .driver-register-grid,.driver-board-layout { grid-template-columns:1fr; } .driver-register-copy { padding:0; } .driver-register-copy>p { max-width:600px; } .driver-requirements { margin-top:24px; } .driver-board-aside { grid-template-columns:1fr 1fr; } }
 @media(max-width:640px) { .driver-hero-grid { padding-block:45px 49px; gap:31px; } .driver-hero-copy h1 { font-size:clamp(3.4rem,12vw,4.4rem); } .driver-hero-copy>p { font-size:1rem; } .driver-hero-actions { align-items:stretch; gap:8px; } .driver-hero-actions>.primary { width:100%; justify-content:space-between; } .driver-light-link { padding-block:10px; } .driver-hero-facts { gap:8px 17px; font-size:.8125rem; } .driver-hero-image { height:260px; } .driver-hero-image figcaption { left:10px; right:10px; bottom:10px; padding:11px 12px; font-size:.8125rem; } .driver-intro { padding-block:53px 59px; } .driver-intro h2,.driver-register-copy h2,.driver-close h2 { font-size:2.9rem; } .driver-intro-grid { grid-template-columns:1fr; margin-top:24px; } .driver-intro-grid article { padding:22px 24px; } .driver-step-icon { margin-bottom:15px; } .driver-register-wrap { padding-block:55px 62px; } .driver-register-grid { gap:28px; } .driver-form-card { padding:27px 21px; } .driver-form-heading h2 { font-size:2.25rem; } .driver-form .fields,.driver-rate-form .fields { grid-template-columns:1fr; } .driver-form .fields .full,.driver-rate-form .fields .full { grid-column:auto; } .driver-form>.primary { width:100%; } .driver-close { align-items:flex-start; flex-direction:column; padding-block:47px 53px; gap:22px; } .driver-board-hero { padding-block:30px 45px; } .driver-board-back { margin-bottom:23px; } .driver-board-hero h1 { font-size:3.6rem; } .driver-board-layout { padding-block:37px 64px; } .driver-board-heading { align-items:start; } .driver-board-heading h2 { font-size:2.25rem; } .driver-board-heading .secondary { padding-inline:11px; } .driver-board-empty { padding:38px 18px; } .driver-load-card { padding:22px 19px; } .driver-load-top { align-items:flex-start; flex-wrap:wrap; } .driver-load-card h3 { font-size:1.3rem; } .driver-load-action { align-items:flex-start; flex-direction:column; gap:10px; } .driver-rate-form { padding:19px; } .driver-board-aside { grid-template-columns:1fr; } }
