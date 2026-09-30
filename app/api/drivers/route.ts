@@ -1,8 +1,25 @@
 import { auth } from '@clerk/nextjs/server';
-import { env } from 'cloudflare:workers';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { db } from '@/lib/desk-db';
+import { safeProfileText } from '@/lib/market';
 export const dynamic = 'force-dynamic';
-const schema = z.object({businessName:z.string().trim().min(2).max(150),contactEmail:z.string().email().max(200),mcNumber:z.string().trim().max(30),dotNumber:z.string().trim().max(30).optional(),equipment:z.string().trim().min(3).max(200)});
-export async function GET(){const {userId}=await auth();if(!userId)return NextResponse.json({error:'Sign in to view your driver registration.'},{status:401});try{const driver=await env.DB!.prepare('SELECT business_name AS businessName,contact_email AS contactEmail,mc_number AS mcNumber,dot_number AS dotNumber,equipment,status FROM drivers WHERE clerk_user_id=?').bind(userId).first();return NextResponse.json({driver})}catch(e){console.error('Driver fetch failed',e);return NextResponse.json({error:'Driver profile unavailable.'},{status:503})}}
-export async function POST(req:Request){const {userId}=await auth();if(!userId)return NextResponse.json({error:'Sign in to register as a driver.'},{status:401});const body=await req.json().catch(()=>null) as Record<string,unknown>|null;const parsed=schema.safeParse(body);if(!parsed.success)return NextResponse.json({error:'Check your business and carrier details.'},{status:400});const d=parsed.data;try{const existing=await env.DB!.prepare('SELECT status FROM drivers WHERE clerk_user_id=?').bind(userId).first<{status:string}>();if(existing?.status==='approved')return NextResponse.json({error:'Your approved registration cannot be changed here. Contact support.'},{status:409});const now=new Date().toISOString();await env.DB!.prepare('INSERT INTO drivers (clerk_user_id,business_name,contact_email,mc_number,dot_number,equipment,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(clerk_user_id) DO UPDATE SET business_name=excluded.business_name,contact_email=excluded.contact_email,mc_number=excluded.mc_number,dot_number=excluded.dot_number,equipment=excluded.equipment,status=\'pending_verification\',updated_at=excluded.updated_at').bind(userId,d.businessName,d.contactEmail,d.mcNumber,d.dotNumber||null,d.equipment,'pending_verification',now,now).run();return NextResponse.json({status:'pending_verification'},{status:201})}catch(e){console.error('Driver registration failed',e);return NextResponse.json({error:'Could not save your registration.'},{status:503})}}
+const schema = z.object({
+  businessName:z.string().trim().min(2).max(150),contactEmail:z.string().trim().email().max(200),
+  mcNumber:z.string().trim().max(30),dotNumber:z.string().trim().max(30),equipment:z.string().trim().min(3).max(200),
+  about:safeProfileText(700),serviceArea:safeProfileText(160),vehicleDetails:safeProfileText(250),
+  businessType:z.enum(['sole_proprietor','llc','corporation','other']),insuranceDescription:safeProfileText(250),
+});
+export async function GET(){
+ const {userId}=await auth();if(!userId)return NextResponse.json({error:'Sign in to view your driver profile.'},{status:401});
+ try{const driver=await db().prepare('SELECT business_name AS businessName,contact_email AS contactEmail,mc_number AS mcNumber,dot_number AS dotNumber,equipment,about,service_area AS serviceArea,vehicle_details AS vehicleDetails,business_type AS businessType,insurance_description AS insuranceDescription,vehicle_photo_key AS vehiclePhotoKey,profile_photo_key AS profilePhotoKey,status FROM drivers WHERE clerk_user_id=?').bind(userId).first();return NextResponse.json({driver})}
+ catch(error){console.error('Driver fetch failed',error);return NextResponse.json({error:'Driver profile unavailable.'},{status:503})}
+}
+export async function POST(req:Request){
+ const {userId}=await auth();if(!userId)return NextResponse.json({error:'Sign in to create your driver profile.'},{status:401});
+ const parsed=schema.safeParse(await req.json().catch(()=>null));if(!parsed.success)return NextResponse.json({error:'Check your business and vehicle details.',issues:parsed.error.flatten().fieldErrors},{status:400});
+ const d=parsed.data,now=new Date().toISOString();
+ try{await db().prepare("INSERT INTO drivers (clerk_user_id,business_name,contact_email,mc_number,dot_number,equipment,about,service_area,vehicle_details,business_type,insurance_description,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,'pending_verification',?,?) ON CONFLICT(clerk_user_id) DO UPDATE SET business_name=excluded.business_name,contact_email=excluded.contact_email,mc_number=excluded.mc_number,dot_number=excluded.dot_number,equipment=excluded.equipment,about=excluded.about,service_area=excluded.service_area,vehicle_details=excluded.vehicle_details,business_type=excluded.business_type,insurance_description=excluded.insurance_description,status='pending_verification',updated_at=excluded.updated_at")
+ .bind(userId,d.businessName,d.contactEmail,d.mcNumber,d.dotNumber,d.equipment,d.about,d.serviceArea,d.vehicleDetails,d.businessType,d.insuranceDescription,now,now).run();return NextResponse.json({status:'saved'})}
+ catch(error){console.error('Driver save failed',error);return NextResponse.json({error:'Could not save your profile.'},{status:503})}
+}

@@ -64,6 +64,13 @@ export const drivers = sqliteTable('drivers', {
   mcNumber: text('mc_number').notNull(),
   dotNumber: text('dot_number'),
   equipment: text('equipment').notNull(),
+  about: text('about').notNull().default(''),
+  serviceArea: text('service_area').notNull().default(''),
+  vehicleDetails: text('vehicle_details').notNull().default(''),
+  businessType: text('business_type').notNull().default('unspecified'),
+  insuranceDescription: text('insurance_description').notNull().default(''),
+  vehiclePhotoKey: text('vehicle_photo_key'),
+  profilePhotoKey: text('profile_photo_key'),
   status: text('status').notNull().default('pending_verification'),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
@@ -115,3 +122,9 @@ export const directOffers = sqliteTable('direct_offers', {
  driverId:text('driver_id').notNull(), driverName:text('driver_name').notNull(), driverEmail:text('driver_email').notNull(),
  amountCents:integer('amount_cents').notNull(),note:text('note').notNull(),status:text('status').notNull().default('pending'),createdAt:text('created_at').notNull(),
 },t=>[index('idx_direct_offers_listing').on(t.listingId,t.createdAt),uniqueIndex('idx_direct_offers_driver').on(t.listingId,t.driverId)]);
+
+export const directReviews = sqliteTable('direct_reviews', {
+ id:integer('id').primaryKey({autoIncrement:true}),listingId:integer('listing_id').notNull().unique().references(()=>directListings.id),
+ driverId:text('driver_id').notNull(),shipperId:text('shipper_id').notNull(),rating:integer('rating').notNull(),
+ comment:text('comment').notNull(),createdAt:text('created_at').notNull(),
+},t=>[index('idx_direct_reviews_driver').on(t.driverId)]);

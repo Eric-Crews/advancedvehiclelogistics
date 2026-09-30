@@ -28,7 +28,6 @@ export async function GET(){
   catch(e){console.error('Customer loads fetch failed',e);return NextResponse.json({error:'Your requests are temporarily unavailable.'},{status:503})}
 }
 export async function POST(req:Request){
-  if(process.env.AVL_LEGACY_INTAKE_ENABLED!=='true')return NextResponse.json({error:'The quote intake has moved to shipper-created listings. Use /post-load or POST /api/market/listings.'},{status:410});
   const {userId}=await auth();if(!userId)return NextResponse.json({error:'Please sign in to send your request.'},{status:401});
   const parsed=requestSchema.safeParse(await req.json().catch(()=>null));
   if(!parsed.success)return NextResponse.json({error:'Please check the highlighted details and try again.',issues:parsed.error.flatten().fieldErrors},{status:400});

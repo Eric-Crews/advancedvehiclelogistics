@@ -22,7 +22,7 @@ export async function GET(req: Request) {
   try {
     if (mine) {
       if (!userId) return NextResponse.json({ error: 'Sign in to see your listings.' }, { status: 401 });
-      const result = await db().prepare('SELECT id,title,description,origin,destination,pickup_date AS pickupDate,equipment,handling,weight_lbs AS weightLbs,length_ft AS lengthFt,offered_cents AS offeredCents,status,selected_offer_id AS selectedOfferId,created_at AS createdAt FROM direct_listings WHERE shipper_id=? ORDER BY id DESC LIMIT 100').bind(userId).all();
+      const result = await db().prepare('SELECT id,title,description,origin,destination,pickup_date AS pickupDate,equipment,handling,weight_lbs AS weightLbs,length_ft AS lengthFt,offered_cents AS offeredCents,status,selected_offer_id AS selectedOfferId,created_at AS createdAt, EXISTS(SELECT 1 FROM direct_reviews r WHERE r.listing_id=direct_listings.id) AS hasReview FROM direct_listings WHERE shipper_id=? ORDER BY id DESC LIMIT 100').bind(userId).all();
       return NextResponse.json({ listings: result.results, feeCents: feeCents(), checkoutAvailable: Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET && process.env.AVL_PUBLIC_URL?.startsWith('https://')) });
     }
     const result = await db().prepare("SELECT id,title,description,origin,destination,pickup_date AS pickupDate,equipment,handling,weight_lbs AS weightLbs,length_ft AS lengthFt,offered_cents AS offeredCents,status,created_at AS createdAt FROM direct_listings WHERE status='open' ORDER BY id DESC LIMIT 100").all();

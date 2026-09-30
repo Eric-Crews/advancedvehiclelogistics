@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const city = z.string().trim().regex(/^[A-Za-z .'-]+, [A-Z]{2}$/, 'Use City, ST (for example, Asheville, NC).').max(100);
 const contact = /(?:[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}|https?:\/\/|www\.|\b\d{1,6}\s+[\w.'-]+(?:\s+[\w.'-]+){0,3}\s+(?:st|street|rd|road|ave|avenue|blvd|drive|dr|lane|ln|way|ct|court)\b)/i;
 const publicText = (min: number, max: number) => z.string().trim().min(min).max(max).refine(value => !contact.test(value), 'Keep contacts, links, and street addresses out of public details.');
+export const safeProfileText = (max: number) => z.string().trim().max(max).refine(value => !contact.test(value), 'Remove contacts, links, and street addresses from profile text.');
 export const listingSchema = z.object({
   title: publicText(5,100), description: publicText(20,1500),
   origin: city, destination: city, pickupDate: z.string().trim().min(4).max(40),
