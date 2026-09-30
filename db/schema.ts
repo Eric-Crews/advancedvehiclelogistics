@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text, real, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, text, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 export const loads = sqliteTable('loads', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -101,3 +101,17 @@ export const jobEstimates = sqliteTable('job_estimates', {
 export const aiUsageLimits = sqliteTable('ai_usage_limits', {
   key: text('key').primaryKey(), count: integer('count').notNull().default(0), expiresAt: integer('expires_at').notNull(),
 }, t => [index('idx_ai_limits_expiry').on(t.expiresAt)]);
+
+export const directListings = sqliteTable('direct_listings', {
+ id: integer('id').primaryKey({autoIncrement:true}), shipperId:text('shipper_id').notNull(),
+ title:text('title').notNull(), description:text('description').notNull(), origin:text('origin').notNull(), destination:text('destination').notNull(),
+ pickupDate:text('pickup_date').notNull(), equipment:text('equipment').notNull(), weightLbs:integer('weight_lbs'), lengthFt:real('length_ft'),
+ handling:text('handling').notNull(), offeredCents:integer('offered_cents').notNull(), shipperName:text('shipper_name').notNull(),
+ shipperEmail:text('shipper_email').notNull(), shipperPhone:text('shipper_phone'), status:text('status').notNull().default('draft'),
+ stripeSessionId:text('stripe_session_id').unique(), selectedOfferId:integer('selected_offer_id'), createdAt:text('created_at').notNull(), paidAt:text('paid_at'),
+}, t=>[index('idx_direct_listings_public').on(t.status,t.createdAt),index('idx_direct_listings_shipper').on(t.shipperId,t.createdAt)]);
+export const directOffers = sqliteTable('direct_offers', {
+ id:integer('id').primaryKey({autoIncrement:true}), listingId:integer('listing_id').notNull().references(()=>directListings.id),
+ driverId:text('driver_id').notNull(), driverName:text('driver_name').notNull(), driverEmail:text('driver_email').notNull(),
+ amountCents:integer('amount_cents').notNull(),note:text('note').notNull(),status:text('status').notNull().default('pending'),createdAt:text('created_at').notNull(),
+},t=>[index('idx_direct_offers_listing').on(t.listingId,t.createdAt),uniqueIndex('idx_direct_offers_driver').on(t.listingId,t.driverId)]);

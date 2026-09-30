@@ -1,0 +1,5 @@
+import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/desk-db';
+export const dynamic='force-dynamic';
+export async function GET(){const {userId}=await auth();if(!userId)return NextResponse.json({error:'Sign in first.'},{status:401});try{const rows=await db().prepare("SELECT o.id,o.listing_id AS listingId,o.amount_cents AS amountCents,o.note,o.status,l.title,l.origin,l.destination,l.selected_offer_id AS selectedOfferId,l.shipper_name AS shipperName,l.shipper_email AS shipperEmail,l.shipper_phone AS shipperPhone FROM direct_offers o JOIN direct_listings l ON l.id=o.listing_id WHERE o.driver_id=? ORDER BY o.id DESC LIMIT 100").bind(userId).all();return NextResponse.json({offers:rows.results.map(row=>({id:row.id,listingId:row.listingId,amountCents:row.amountCents,note:row.note,status:row.status,title:row.title,origin:row.origin,destination:row.destination,shipperContact:row.selectedOfferId===row.id?{name:row.shipperName,email:row.shipperEmail,phone:row.shipperPhone}:null}))})}catch(error){console.error('My offers failed',error);return NextResponse.json({error:'Offers unavailable.'},{status:503})}}

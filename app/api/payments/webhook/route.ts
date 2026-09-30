@@ -11,7 +11,13 @@ export async function POST(req:Request){
  catch{return NextResponse.json({error:'Invalid signature'},{status:400})}
  try{
   if(['checkout.session.completed','checkout.session.async_payment_succeeded','checkout.session.async_payment_failed','checkout.session.expired'].includes(event.type)){
-   await applyCheckoutSession(event.data.object as Stripe.Checkout.Session,event.type);
+   const session=event.data.object as Stripe.Checkout.Session;
+   if(session.metadata?.kind==='direct_listing'){
+    if((event.type==='checkout.session.completed'&&session.payment_status==='paid')||event.type==='checkout.session.async_payment_succeeded'){
+     const id=Number(session.metadata.listing_id);
+     if(Number.isSafeInteger(id)&&id>0)await db().prepare("UPDATE direct_listings SET status='open',paid_at=? WHERE id=? AND shipper_id=? AND stripe_session_id=? AND status='draft'").bind(new Date().toISOString(),id,session.metadata.shipper_id,session.id).run();
+    }
+   }else await applyCheckoutSession(session,event.type);
   }else if(event.type==='charge.refunded'){
    const charge=event.data.object as Stripe.Charge;
    const intent=typeof charge.payment_intent==='string'?charge.payment_intent:charge.payment_intent?.id;
