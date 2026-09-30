@@ -1,6 +1,6 @@
 'use client';
 
-import { Show, SignInButton, SignUpButton, useAuth } from '@clerk/nextjs';
+import { Show, SignInButton, SignUpButton, useAuth } from '@/components/auth/local-auth';
 import { ArrowRight, Check, ClipboardCheck, MapPin, ShieldCheck, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';

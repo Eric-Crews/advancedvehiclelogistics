@@ -1,5 +1,5 @@
 import { env } from 'cloudflare:workers';
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/lib/local-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 export const dynamic='force-dynamic';

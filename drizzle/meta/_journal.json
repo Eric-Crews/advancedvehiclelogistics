@@ -71,6 +71,20 @@
       "when": 1790731126150,
       "tag": "0009_noisy_darwin",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1790732148804,
+      "tag": "0010_first_warpath",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1790732199169,
+      "tag": "0011_solid_moira_mactaggert",
+      "breakpoints": true
     }
   ]
 }

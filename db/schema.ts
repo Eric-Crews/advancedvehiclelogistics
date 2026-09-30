@@ -115,7 +115,7 @@ export const directListings = sqliteTable('direct_listings', {
  pickupDate:text('pickup_date').notNull(), equipment:text('equipment').notNull(), weightLbs:integer('weight_lbs'), lengthFt:real('length_ft'),
  handling:text('handling').notNull(), offeredCents:integer('offered_cents').notNull(), shipperName:text('shipper_name').notNull(),
  shipperEmail:text('shipper_email').notNull(), shipperPhone:text('shipper_phone'), status:text('status').notNull().default('draft'),
- stripeSessionId:text('stripe_session_id').unique(), selectedOfferId:integer('selected_offer_id'), createdAt:text('created_at').notNull(), paidAt:text('paid_at'),
+ reviewNote:text('review_note'),stripeSessionId:text('stripe_session_id').unique(), selectedOfferId:integer('selected_offer_id'), createdAt:text('created_at').notNull(), paidAt:text('paid_at'),
 }, t=>[index('idx_direct_listings_public').on(t.status,t.createdAt),index('idx_direct_listings_shipper').on(t.shipperId,t.createdAt)]);
 export const directOffers = sqliteTable('direct_offers', {
  id:integer('id').primaryKey({autoIncrement:true}), listingId:integer('listing_id').notNull().references(()=>directListings.id),
@@ -128,3 +128,10 @@ export const directReviews = sqliteTable('direct_reviews', {
  driverId:text('driver_id').notNull(),shipperId:text('shipper_id').notNull(),rating:integer('rating').notNull(),
  comment:text('comment').notNull(),createdAt:text('created_at').notNull(),
 },t=>[index('idx_direct_reviews_driver').on(t.driverId)]);
+
+export const localUsers=sqliteTable('local_users',{
+ id:text('id').primaryKey(),email:text('email').notNull().unique(),passwordHash:text('password_hash').notNull(),salt:text('salt').notNull(),createdAt:text('created_at').notNull(),failedAttempts:integer('failed_attempts').notNull().default(0),lockedUntil:text('locked_until'),
+});
+export const localSessions=sqliteTable('local_sessions',{
+ tokenHash:text('token_hash').primaryKey(),userId:text('user_id').notNull().references(()=>localUsers.id),expiresAt:text('expires_at').notNull(),createdAt:text('created_at').notNull(),
+},t=>[index('idx_local_sessions_user').on(t.userId)]);

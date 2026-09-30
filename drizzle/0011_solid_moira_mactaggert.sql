@@ -1,0 +1,1 @@
+ALTER TABLE `direct_listings` ADD `review_note` text;

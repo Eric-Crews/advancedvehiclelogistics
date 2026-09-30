@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/lib/local-auth';
 import { env } from 'cloudflare:workers';
 import { NextResponse } from 'next/server';
 export const dynamic='force-dynamic';

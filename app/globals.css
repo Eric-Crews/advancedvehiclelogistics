@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
-@import '@clerk/ui/themes/shadcn.css';
 
 :root {
   --ink: #182938; --muted: #45566a; --navy: #172532; --blue: #12659f;
@@ -779,3 +778,5 @@ label { font-size:.9375rem; font-weight:600; }
 .market-review-block .market-check { display:flex; align-items:center; gap:8px; }
 .market-review-block .market-check input { width:auto; margin:0; }
 @media(max-width:640px) { .driver-profile-extra,.market-driver-profile { grid-template-columns:1fr; } .driver-profile-extra .full { grid-column:auto; } .market-driver-photos { flex-direction:row; flex-wrap:wrap; } .market-driver-photos img { max-width:180px; } }
+.local-auth-page{min-height:60vh;display:grid;place-items:center;padding:60px 20px}.local-auth-page .market-form-card{width:min(100%,480px);display:grid;gap:18px}.local-auth-page label{display:grid;gap:8px;font-weight:700}.local-auth-page input{width:100%;padding:14px;border:1px solid #cbd7e1;border-radius:6px}.auth-link-wrap{display:inline-flex}.local-user{display:flex;gap:10px;align-items:center;font-size:14px}.local-user button{border:0;background:transparent;color:#146fba;cursor:pointer}
+.admin-review-actions{display:flex;gap:16px;align-items:end;flex-wrap:wrap;margin-top:24px}.admin-review-actions label{display:grid;gap:6px;min-width:min(100%,340px);font-weight:700}.admin-review-actions textarea{min-height:70px;padding:12px;border:1px solid #cbd7e1;border-radius:6px}

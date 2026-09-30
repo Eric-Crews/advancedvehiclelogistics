@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@/lib/local-auth';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/desk-db';

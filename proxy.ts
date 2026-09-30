@@ -1,11 +1,2 @@
-import { clerkMiddleware } from '@clerk/nextjs/server';
-
-export default clerkMiddleware();
-
-export const config = {
-  matcher: [
-    "/:path*",
-    '/(api|trpc)(.*)',
-    '/__clerk/:path*',
-  ],
-};
+import { NextResponse } from 'next/server';
+export function proxy(){return NextResponse.next()}

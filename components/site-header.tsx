@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Show, SignInButton, UserButton } from '@clerk/nextjs';
+import { Show, SignInButton, UserButton } from '@/components/auth/local-auth';
 import { ArrowRight, Menu, X } from 'lucide-react';
 import { Brand } from './brand';
 
