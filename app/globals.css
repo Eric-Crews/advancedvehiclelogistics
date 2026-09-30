@@ -546,6 +546,63 @@ label { font-size:.9375rem; font-weight:600; }
 .driver-board-search input { margin:0; padding-left:46px; }
 .driver-board-search p { margin:8px 0 0; color:var(--muted); font-size:.875rem; line-height:1.55; }
 .driver-return-match { display:inline-flex; margin:-4px 0 14px; padding:7px 11px; border-radius:4px; background:#fff0df; color:#82400b; font-size:.8125rem; font-weight:700; }
+/* Route-first home experience */
+.freight-home-hero { background:radial-gradient(circle at 77% 20%,#28485b 0%,#192f40 44%,#152531 100%); }
+.freight-home-grid { display:grid; grid-template-columns:1.05fr .95fr; align-items:center; gap:70px; padding-block:69px 122px; }
+.freight-home-grid .hero-copy h1 { max-width:740px; font-size:clamp(3.6rem,5.2vw,5.35rem); }
+.freight-home-grid .hero-copy>p { max-width:570px; }
+.freight-hero-link { display:inline-flex; align-items:center; gap:9px; padding:12px 0; color:#fff; font-weight:700; font-size:.9375rem; }
+.freight-hero-link:hover { color:#ffb372; }
+.freight-home-route { border:1px solid #7891a170; border-radius:11px; background:#0c1b2885; box-shadow:0 24px 65px #07131e55; overflow:hidden; color:#fff; }
+.freight-route-top { display:flex; justify-content:space-between; gap:12px; padding:22px 24px; border-bottom:1px solid #ffffff27; color:#bcd0dd; font-size:.75rem; font-weight:800; letter-spacing:.11em; }
+.freight-route-top span:last-child { color:#ffb676; }
+.freight-route-places { display:flex; justify-content:space-between; gap:12px; padding:33px 27px 11px; font-family:var(--font-display); font-size:clamp(1.6rem,2.55vw,2.65rem); font-weight:700; line-height:1.1; }
+.freight-route-places span:last-child { text-align:right; }
+.freight-route-track { display:flex; align-items:center; padding:0 32px; }
+.freight-route-dot { width:14px; height:14px; border:3px solid #ff9e4b; border-radius:50%; }
+.freight-route-dot:last-child { background:#ff9e4b; }
+.freight-route-line { height:2px; flex:1; margin-inline:4px; background:linear-gradient(90deg,#ff9e4b,#a4c1d1,#ff9e4b); }
+.freight-route-legs { display:grid; grid-template-columns:1fr 1fr; gap:16px; padding:15px 27px 0; }
+.freight-route-legs div:last-child { text-align:right; }
+.freight-route-legs span { display:block; color:#f7ac6d; font-size:.75rem; font-weight:800; letter-spacing:.1em; }
+.freight-route-legs strong { display:block; font-size:.9375rem; }
+.freight-home-route>p { margin:26px 27px 27px; max-width:430px; color:#d5e4eb; font-size:.9375rem; line-height:1.65; }
+.freight-route-footer { display:flex; align-items:center; gap:11px; padding:17px 26px; border-top:1px solid #ffffff27; background:#ffffff0b; font-size:.875rem; color:#e4eef3; }
+.freight-route-footer svg { color:#ff9e4b; }
+.freight-audiences { display:grid; grid-template-columns:1fr 1fr; gap:20px; padding-block:58px 84px; }
+.freight-audience-card { padding:32px; border:1px solid #bdceda; border-top:4px solid var(--blue); border-radius:7px; background:#fff; }
+.freight-audience-card.driver { border-top-color:var(--orange); }
+.freight-audience-card h2 { font-size:2.3rem; margin:0 0 11px; }
+.freight-audience-card p { max-width:500px; color:var(--muted); font-size:1rem; line-height:1.75; }
+.freight-audience-card .text-button { color:var(--blue-dark); }
+.freight-capabilities { padding-block:77px 85px; background:#eaf1f5; }
+.freight-capabilities-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.freight-capabilities-grid article { padding:27px; border:1px solid #c8d7e1; border-radius:7px; background:#fff; }
+.freight-capabilities-grid .service-icon { margin-bottom:20px; }
+.freight-capabilities-grid h3 { font-size:1.2rem; margin-bottom:8px; }
+.freight-capabilities-grid p { color:var(--muted); font-size:.9375rem; line-height:1.7; margin:0; }
+.freight-process { padding-block:92px 98px; }
+.freight-process-head { max-width:710px; }
+.freight-process-head h2 { font-size:clamp(2.7rem,4vw,3.9rem); margin-bottom:14px; }
+.freight-process-head>p { font-size:1.0625rem; color:var(--muted); line-height:1.7; }
+.freight-process-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:45px; }
+.freight-process-grid article { border-top:2px solid var(--blue); padding-top:22px; }
+.freight-process-grid article>span { color:var(--blue-dark); font-size:.8125rem; font-weight:800; letter-spacing:.1em; }
+.freight-process-grid svg { display:block; color:var(--blue-dark); margin:23px 0 15px; }
+.freight-process-grid h3 { font-size:1.2rem; margin-bottom:9px; }
+.freight-process-grid p { font-size:.9375rem; line-height:1.75; color:var(--muted); }
+.freight-home-close { padding-block:58px; background:#155e91; color:#fff; }
+.freight-home-close>.shell { display:flex; align-items:center; justify-content:space-between; gap:40px; }
+.freight-home-close .eyebrow { color:#e4eff7; }
+.freight-home-close h2 { font-size:clamp(2.5rem,3.5vw,3.4rem); margin-bottom:12px; }
+.freight-home-close p { color:#eef6fa; margin:0; }
+.freight-close-actions { display:grid; justify-items:start; gap:12px; min-width:235px; font-size:.9375rem; font-weight:650; }
+.freight-close-actions>a:not(.primary) { display:flex; align-items:center; gap:8px; }
+.freight-close-actions>a:hover { text-decoration:underline; }
+.smart-estimate .smart-route-fields { margin:20px 0 24px; }
+.smart-estimate .description-label { display:block; }
+@media(max-width:900px) { .freight-home-grid { gap:30px; } .freight-home-grid .hero-copy h1 { font-size:3.65rem; } .freight-route-places { font-size:1.8rem; } }
+@media(max-width:640px) { .freight-home-grid { grid-template-columns:1fr; padding-block:42px 88px; gap:31px; } .freight-home-grid .hero-copy h1 { font-size:clamp(3.25rem,11vw,4.2rem); } .freight-hero-link { padding:7px 0; } .freight-home-route>p { font-size:.875rem; } .freight-audiences { grid-template-columns:1fr; padding-block:48px 55px; gap:13px; } .freight-audience-card { padding:25px; } .freight-audience-card h2 { font-size:2rem; } .freight-capabilities { padding-block:55px 60px; } .freight-capabilities-grid,.freight-process-grid { grid-template-columns:1fr; gap:14px; } .freight-capabilities-grid article { padding:21px 23px; } .freight-capabilities-grid .service-icon { position:static; margin-bottom:14px; } .freight-process { padding-block:62px; } .freight-process-grid { margin-top:30px; gap:23px; } .freight-process-grid svg { margin:13px 0; } .freight-home-close>.shell { display:grid; gap:25px; } .freight-home-close { padding-block:45px; } .freight-route-top { padding:16px; font-size:.6875rem; } .freight-route-places { padding:25px 18px 11px; font-size:1.8rem; } .freight-route-legs { padding-inline:18px; } .freight-route-track { padding-inline:23px; } .smart-estimate .smart-route-fields>label:last-child { max-width:none; } }
 @media(max-width:800px) { .driver-freight-grid { grid-template-columns:1fr; gap:35px; padding-block:55px 65px; } }
 @media(max-width:640px) { .driver-freight-grid { padding-block:44px 55px; } .driver-freight-grid .driver-hero-copy h1 { font-size:clamp(3.3rem,12vw,4.4rem); } .driver-route-panel { padding:16px; } .driver-route-leg { padding:18px; } .driver-route-leg strong { font-size:2rem; } .driver-board-search { padding:17px; } }
 @media(max-width:1000px) { .driver-hero-grid { gap:33px; } .driver-hero-copy h1 { font-size:4.3rem; } .driver-register-grid { gap:39px; } .driver-board-layout { gap:20px; } }
